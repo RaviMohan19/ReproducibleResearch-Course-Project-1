@@ -1,0 +1,172 @@
+---
+title: "Activity_Monitoring_Report"
+author: "Ravi M.B"
+date: "April 1, 2018"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: inline
+---
+
+# Introduction
+
+This report is written for elucidating the R script **_activity_data_anlysis.R_** written for _Course Project 1 of Reproducible Research_, the R script **_activity_data_analysis.R_** analyses the data from an anonymous individual personal activity monitoring device, this device as sugested on [CoursEra webpage](https://www.coursera.org/learn/reproducible-research/peer/gYyPt/course-project-1) collects data at 5 minute intervals through out the day. 
+
+The data consists of two months of data collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
+
+To finish the project,I have categorized the project in to tasks listed on CoursEra webpage they are described below
+
+## Goal 1: Loading and Processing data
+
+Activity Data set is extracted from [CourseEra course project 1 instruction page](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip), post extracting of  data I have set the working directory followed by unzipping the file to "step_data.csv". The data is then loaded and stro under variable
+**_"read_activity"_**.
+
+Variable names and the structure of the file are given by
+
+```{r}
+setwd("~/R/ExploratoryAnalysis/Week2/CourseProject")
+data_url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+data_activity <- "step_data.zip"
+download.file(data_url, data_activity)
+unzip(data_activity)
+read_activity <- read.csv("activity.csv", sep = ",")
+dim(read_activity)
+names(read_activity)
+head(read_activity)
+tail(read_activity)
+str(read_activity)
+
+```
+
+after loding and processing the data missing values are ignored and mean of the total number of steps taken per day is evaluated as follows
+
+```{r}
+read_activity$date <- as.Date(read_activity$date)
+clear_na_data <- subset(read_activity, !is.na(read_activity$steps))
+total_steps_sum <-
+  tapply(
+    clear_na_data$steps,
+    clear_na_data$date,
+    sum,
+    na.rm = TRUE,
+    simplify = T
+  )
+```
+
+histogram of the total number of steps taken each day is plotted using the below R script and also mean and median are calculated
+```{r}
+hist(x=total_steps_sum,
+     col="red",
+     breaks=10,
+     xlab="Daily steps",
+     ylab="Frequency",
+     main="Total Number of Steps per Day neglecting missing data")
+
+mean(total_steps_sum)
+median(total_steps_sum)
+
+```
+
+## Goal 2: Time series plot of Average daily activity pattern
+
+I have costructed  time series plot ** i.e type = _"l"_ ** of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis) also evaluated Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+
+```{r}
+avg_daily <- tapply(clear_na_data$steps, clear_na_data$interval, mean, na.rm=TRUE, simplify=T)
+avg_daily_interval <- data.frame(interval=as.integer(names(avg_daily)), avg=avg_daily)
+with(avg_daily_interval,
+     plot(interval,
+          avg,
+          type="l",
+          xlab="5-minute intervals",
+          ylab="average number of steps"))
+
+
+max_num_steps <- max(avg_daily_interval$avg)
+avg_daily_interval[avg_daily_interval$avg == max_num_steps, ]
+```
+
+here **_avg_daily_interval_** and **_max_num_steps** variables were created to store the relevant results.
+
+## Goal 3: Imputing missing values
+
+Further a new data set which would consider or impute the missing values is costructed and the resulting data set evaluations are compared with the results where the missing values were neglected, the data from both the sets (missing values neglected and missing values imputed ) when compared it cold be inferred that mean and median were almost similar, please check the **ImputeData_MissingData.png** file 
+```{r}
+nrow(read_activity[is.na(read_activity$steps),])
+
+impute_miss <- read_activity
+na_data <- is.na(impute_miss$steps)
+clear_na_avg <- tapply(clear_na_data$steps, clear_na_data$interval, mean, na.rm=TRUE, simplify=T)
+impute_miss$steps[na_data] <- clear_na_avg[as.character(impute_miss$interval[na_data])]
+new_data <- tapply(impute_miss$steps, impute_miss$date, sum, na.rm=TRUE, simplify=T)
+
+hist(x=new_data,
+     col="blue",
+     breaks=10,
+     xlab="Daily steps",
+     ylab="Frequency",
+     main="Total number of steps(comparison with missing data imputed)")
+
+
+hist(x=total_steps_sum,
+     col="red",
+     breaks=10,
+     xlab="Daily steps",
+     ylab="Frequency",
+     main="Total number of steps(comparison with missing data imputed)",
+     add=T)
+legend("topright", c("Imputed Data", "Non-NA Data"), fill=c("blue", "red") )
+
+mean(new_data)
+median(new_data)
+
+```
+
+## Goal 4: Evaluating weekdays and weekend patterns
+
+I have Created a new factor variable **check_day** in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+```{r}
+check_day <- function(days) {
+  wd <- weekdays(days)
+  ifelse (wd == "Saturday" | wd == "Sunday", "weekend", "weekday")
+}
+
+test_data <- sapply(impute_miss$date, check_day)
+impute_miss$week <- as.factor(test_data)
+dim(impute_miss)
+head(impute_miss)
+tail(impute_miss)
+week_data <- aggregate(steps ~ week+interval, data=impute_miss, FUN=mean)
+```
+
+the resulting _time series plot_ with _type="1"_ of the 5-minute interval for the average number of steps taken and average across all weekday days or weekend days is plotted as follows
+
+```{r}
+library(lattice)
+xyplot(steps ~ interval | factor(week),
+       layout = c(1, 2),
+       xlab="Interval",
+       ylab="Number of steps",
+       type="l",
+       lty=1,
+       data=week_data)
+
+```
+
+here **week_data** variable stores the average or aggregate of steps taken in refernce to wekdays and wekends.
+
+## Summary
+
+This project report meets all the below mentioned criteria for the submission
+
+1.	Code for reading in the dataset and/or processing the data
+2.	Histogram of the total number of steps taken each day
+3.	Mean and median number of steps taken each day
+4.	Time series plot of the average number of steps taken
+5.	The 5-minute interval that, on average, contains the maximum number of steps
+6.	Code to describe and show a strategy for imputing missing data
+7.	Histogram of the total number of steps taken each day after missing values are imputed
+8.	Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+9.	All the R code needed to reproduce the results (numbers, plots, etc.) in the report
