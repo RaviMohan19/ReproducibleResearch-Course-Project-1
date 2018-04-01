@@ -25,7 +25,7 @@ Activity Data set is extracted from [CourseEra course project 1 instruction page
 Variable names and the structure of the file are given by
 
 ```{r}
-setwd("~/R/ExploratoryAnalysis/Week2/CourseProject")
+setwd("~/R/Reproducible_Research/Week2/CourseProject")
 data_url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 data_activity <- "step_data.zip"
 download.file(data_url, data_activity)
