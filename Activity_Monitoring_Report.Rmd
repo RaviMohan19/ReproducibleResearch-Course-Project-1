@@ -19,7 +19,7 @@ To finish the project,I have categorized the project in to tasks listed on Cours
 
 ## Goal 1: Loading and Processing data
 
-Activity Data set is extracted from [CourseEra course project 1 instruction page](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip), post extracting of  data I have set the working directory followed by unzipping the file to "step_data.csv". The data is then loaded and stro under variable
+Activity Data set is extracted from [CourseEra course project 1 instruction page](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip), post extracting data, I have set the working directory followed by unzipping the file to "step_data.csv". The data is then loaded and stored under variable
 **_"read_activity"_**.
 
 Variable names and the structure of the file are given by
