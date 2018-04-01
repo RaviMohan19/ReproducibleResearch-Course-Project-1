@@ -1,6 +1,6 @@
 # ReproducibleResearch-Course-Project-1
 
-This repository **_ReproducibleResearch-Course-Project-1_** consists of a R script file **_analysis_data_analysis.R_** which analyses data file **_activity.csv_** , the course project report **_Activity_Monitoring_Report.Rmd_** its equivalent **_Activity_Monitoring_Report.html_** which is constructed using **knitr** package are also included, the resulting plots are also inluded in the repository
+This repository **_ReproducibleResearch-Course-Project-1_** consists of a R script file **_analysis_data_analysis.R_** which analyses data file **_activity.csv_** , the course project reports **_Activity_Monitoring_Report.Rmd_** its equivalent **_Activity_Monitoring_Report.html_** which is constructed using **knitr** package are also included, the resulting plots are also inluded in the repository
 
 All the submission requirements mention below are met
 
